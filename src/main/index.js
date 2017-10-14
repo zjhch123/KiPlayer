@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
+import Listen from './listener';
 
 /**
  * Set `__static` path to static files in production
@@ -20,8 +21,8 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    width: 1080,
-    height: 800,
+    width: 400,
+    height: 400,
     useContentSize: true,
     resizable: false,
     titleBarStyle: 'hidden',
@@ -52,3 +53,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+Listen();
+
