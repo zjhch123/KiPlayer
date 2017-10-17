@@ -1,7 +1,6 @@
 'use strict'
 
 import { app, BrowserWindow } from 'electron'
-import Listen from './listener';
 
 /**
  * Set `__static` path to static files in production
@@ -53,6 +52,4 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-Listen();
 

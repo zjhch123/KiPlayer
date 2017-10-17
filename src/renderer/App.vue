@@ -51,20 +51,40 @@
       isRange: false,
       isPlaying: false,
       isListShow: true,
-      musicList: [
-        { 
-          name: '華鳥風月',
-          id: 869119,
-          singer: 'senya',
-          url: 'http://api.hduzplus.xyz/music/senya - 華鳥風月.mp3',
-          pic: 'https://p3.music.126.net/RwsPGpySHPY4OZfRQzxkLQ==/910395627841603.jpg?param=400y400'
-        },
-      ],
+      musicList: [],
       ctx: null,
       player: null,
       progress: 0,
       nowPlayIndex: -1,
     }),
+    created: function() {
+      const self = this;
+      fetch(`http://182.254.148.53:3000/playlist/detail?id=50787020`, {
+        method: 'get',
+        mode: 'cors'
+      }).then((res) => {
+          return res.json()
+      }).then((data) => {
+        if (data.code === 200) {
+          return data.playlist.tracks;
+        } 
+        throw new Error('网络异常');
+      }).then((list) => {
+        return list.reduce((a, b) => {
+          a.push({
+            name: b.name,
+            id: b.id,
+            singer: b.ar[0] && b.ar[0].name,
+            pic: b.al.picUrl + '?param=400y400'
+          });
+          return a;
+        }, []);
+      }).then((list) => {
+        self.musicList = list;
+      }).catch(() => {
+        alert('拉取歌单失败...');
+      });
+    },
     mounted: function() {
       setTimeout(() => {
         this.isPrev = false;
@@ -73,19 +93,22 @@
       this.ctx = document.querySelector('.J_progress').getContext('2d');
       this.ctx.lineWidth = 40;
       this.ctx.strokeStyle = '#50E3C2';
-      if (this.musicList.length != 0) {
-        const music = this.musicList[0];
-        this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
-        this.player.src = music.url;
-      }
     },
     watch: {
       nowPlayIndex: function(newVal) {
         const music = this.musicList[newVal];
         this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
-        this.player.src = music.url;
-        this.player.play();
-        this.isPlaying = true;
+        const self = this;
+        fetch(`http://182.254.148.53:3000/music/url?id=${music.id}`, {
+          method: 'GET',
+          mode: 'cors'
+        }).then(res => {
+          return res.json();
+        }).then(res => {
+          self.player.src = res.data[0].url;
+          this.player.play();
+          this.isPlaying = true;
+        });
       }
     },
     methods: {
@@ -162,7 +185,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  * {
+  .g-main {
     -webkit-app-region: drag;
   }
   &.prev,&:hover {
@@ -369,11 +392,12 @@ html, body {
 }
 .g-list {
   position: absolute;
-  top: 0;
   height: 316px;
   width: 400px;
+  top: 0;
   left: 0;
   background-color: rgba(0,0,0,.6);
+  -webkit-app-region: none;
   z-index: 9;
   transform: translate3d(0,-100%, 0);
   transition: all .6s;
