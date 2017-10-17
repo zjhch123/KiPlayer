@@ -26,6 +26,7 @@ function createWindow () {
     resizable: false,
     titleBarStyle: 'hidden',
     fullscreenable: false,
+    frame: false,
     webPreferences: {
       defaultFontFamily: 'standard',
       defaultEncoding: 'utf-8'

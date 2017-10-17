@@ -19,8 +19,8 @@
     <footer class="g-footer">
       <div class="u-bg"></div>
       <div class="m-controller">
-        <div class="m-mode" :class="{range: isRange, normal: !isRange}" @click="fChangeMode">
-          <a href="javascript:;" class="u-mode-range u-btn"></a>
+        <div class="m-mode" :class="{random: isRandom, normal: !isRandom}" @click="fChangeMode">
+          <a href="javascript:;" class="u-mode-random u-btn"></a>
           <a href="javascript:;" class="u-mode-normal u-btn"></a>
         </div>
         <a href="javascript:;" class="u-prev u-btn" @click="fPrevMusic"></a>
@@ -48,7 +48,7 @@
     data: () => ({
       isPrev: true,
       bg: require('./assets/bg.jpg'),
-      isRange: false,
+      isRandom: false,
       isPlaying: false,
       isListShow: true,
       musicList: [],
@@ -59,7 +59,7 @@
     }),
     created: function() {
       const self = this;
-      fetch(`http://182.254.148.53:3000/playlist/detail?id=50787020`, {
+      fetch(`http://182.254.148.53:3000/playlist/detail?id=926638907`, {
         method: 'get',
         mode: 'cors'
       }).then((res) => {
@@ -119,7 +119,7 @@
         this.uNextMusic();
       },
       fChangeMode: function() {
-        this.isRange = !this.isRange;
+        this.isRandom = !this.isRandom;
       },
       fChangeStatus: function() {
         if (this.nowPlayIndex === -1) {
@@ -160,7 +160,7 @@
         this.nowPlayIndex = (this.nowPlayIndex + 1) % this.musicList.length;
       },
       uPlayEnd: function(e) {
-        if (this.isRange) {
+        if (this.isRandom) {
           this.nowPlayIndex = Math.floor(Math.random() * 100 % this.musicList.length);
         } else {
           this.uNextMusic();
@@ -249,8 +249,8 @@ html, body {
       height: 17px;
       width: 22px;
       position: relative;
-      &.range {
-        .u-mode-range {
+      &.random {
+        .u-mode-random {
           opacity: 1;
           pointer-events: auto;
         }
@@ -260,7 +260,7 @@ html, body {
         }
       }
       &.normal {
-        .u-mode-range {
+        .u-mode-random {
           transform: scale(.8);
           pointer-events: none;
         }
@@ -269,7 +269,7 @@ html, body {
           pointer-events: auto;
         }
       }
-      .u-mode-range, .u-mode-normal {
+      .u-mode-random, .u-mode-normal {
         position: absolute;
         top: 0;
         left: 0;
@@ -278,8 +278,8 @@ html, body {
         opacity: 0;
         transition: all .6s;
       }
-      .u-mode-range {
-        background-image: url('./assets/mode_range.svg');  
+      .u-mode-random {
+        background-image: url('./assets/mode_random.svg');  
       }
       .u-mode-normal {
         background-image: url('./assets/mode_normal.svg');   
