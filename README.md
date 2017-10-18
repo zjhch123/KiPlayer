@@ -2,6 +2,8 @@
 
 > mac music player
 
+![preview](https://github.com/zjhch123/KiPlayer/blob/master/preview/preview.gif)
+
 #### Build Setup
 
 ``` bash
