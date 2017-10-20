@@ -43,6 +43,7 @@
   </div>
 </template>
 <script>
+  import MusicAPI from './MusicAPI.js';
   export default {
     name: 'kirisame',
     data: () => ({
@@ -57,35 +58,12 @@
       progress: 0,
       nowPlayIndex: -1,
     }),
-    created: function() {
+    created: async function() {
       const self = this;
-      fetch(`http://182.254.148.53:3000/playlist/detail?id=926638907`, {
-        method: 'get',
-        mode: 'cors'
-      }).then((res) => {
-          return res.json()
-      }).then((data) => {
-        if (data.code === 200) {
-          return data.playlist.tracks;
-        } 
-        throw new Error('网络异常');
-      }).then((list) => {
-        return list.reduce((a, b) => {
-          a.push({
-            name: b.name,
-            id: b.id,
-            singer: b.ar[0] && b.ar[0].name,
-            pic: b.al.picUrl + '?param=400y400'
-          });
-          return a;
-        }, []);
-      }).then((list) => {
-        self.musicList = list;
-      }).catch(() => {
-        alert('拉取歌单失败...');
-      });
+      self.musicList = await MusicAPI.getPlayListById(926638907);
     },
     mounted: function() {
+      this.fResize();
       setTimeout(() => {
         this.isPrev = false;
       }, 1000);
@@ -93,25 +71,23 @@
       this.ctx = document.querySelector('.J_progress').getContext('2d');
       this.ctx.lineWidth = 40;
       this.ctx.strokeStyle = '#50E3C2';
+      window.addEventListener('resize', () => {
+        this.fResize();
+      })
     },
     watch: {
-      nowPlayIndex: function(newVal) {
+      nowPlayIndex: async function(newVal) {
         const music = this.musicList[newVal];
         this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
-        const self = this;
-        fetch(`http://182.254.148.53:3000/music/url?id=${music.id}`, {
-          method: 'GET',
-          mode: 'cors'
-        }).then(res => {
-          return res.json();
-        }).then(res => {
-          self.player.src = res.data[0].url;
-          this.player.play();
-          this.isPlaying = true;
-        });
+        this.player.src = await MusicAPI.getMusicById(music.id);
+        this.player.play();
+        this.isPlaying = true;
       }
     },
     methods: {
+      fResize: function() {
+        document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 / 16 * 100 + '%');
+      },
       fPrevMusic: function() {
         this.uPrevMusic();
       },
@@ -170,18 +146,26 @@
   }
 </script>
 <style lang="scss">
-html, body {
+html {
   margin: 0;
-  height: 100%;
   width: 100%;
-  max-width: 400px;
-  max-height: 400px;
+  height: 100%;
   font-family: 'PingFangSC-Light','STHeiTi';
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
-#app {
+body {
+  margin: 0;
+  width: 100%;
+  padding-bottom: 100%;
   position: relative;
+}
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -225,7 +209,7 @@ html, body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 84px;
+  height: 8.4rem;
   overflow: hidden;
   background-color: rgba(0,0,0,0.8);
   z-index: 9;
@@ -236,7 +220,7 @@ html, body {
     align-items: center;
     justify-content: space-around;
     height: 100%;
-    padding: 0 28px;
+    padding: 0 2.8rem;
     .u-btn {
       display: block;
       background-size: 100% auto;
@@ -246,8 +230,8 @@ html, body {
       }
     }
     .m-mode {
-      height: 17px;
-      width: 22px;
+      height: 1.7rem;
+      width: 2.2rem;
       position: relative;
       &.random {
         .u-mode-random {
@@ -273,8 +257,8 @@ html, body {
         position: absolute;
         top: 0;
         left: 0;
-        width: 22px;
-        height: 17px;
+        width: 2.2rem;
+        height: 1.7rem;
         opacity: 0;
         transition: all .6s;
       }
@@ -286,8 +270,8 @@ html, body {
       }
     }
     .u-next, .u-prev {
-      height: 18px;
-      width: 22px;
+      height: 1.8rem;
+      width: 2.2rem;
       transition: all .6s;
       &:active {
         transform: scale(.8);
@@ -300,8 +284,8 @@ html, body {
       background-image: url('./assets/next.svg');
     }
     .m-staus {
-      width: 56px;
-      height: 56px;
+      width: 5.6rem;
+      height: 5.6rem;
       position: relative;
       &.play {
         .u-pause {
@@ -325,10 +309,10 @@ html, body {
       }
       .u-pause, .u-play {
         position: absolute;
-        top: 6px;
-        left: 6px;
-        height: 44px;
-        width: 44px;
+        top: .6rem;
+        left: .6rm;
+        height: 4.4rem;
+        width: 4.4rem;
         transition: all .6s;
         opacity: 0;
       }
@@ -340,8 +324,8 @@ html, body {
       }
     }
     .m-list {
-      width: 22px;
-      height: 15px;
+      width: 2.2rem;
+      height: 1.5rem;
       position: relative;
       &.fill {
         .u-list-fill {
@@ -364,8 +348,8 @@ html, body {
         }
       }
       .u-list, .u-list-fill {
-        height: 15px;
-        width: 22px; 
+        height: 1.5rem;
+        width: 2.2rem; 
         transition: all .6s;
         position: absolute;
         top: 0;
@@ -392,8 +376,8 @@ html, body {
 }
 .g-list {
   position: absolute;
-  height: 316px;
-  width: 400px;
+  height: 31.6rem;
+  width: 40rem;
   top: 0;
   left: 0;
   background-color: rgba(0,0,0,.6);
@@ -401,7 +385,7 @@ html, body {
   z-index: 9;
   transform: translate3d(0,-100%, 0);
   transition: all .6s;
-  padding: 24px 16px;
+  padding: 2.4rem 1.6rem;
   box-sizing: border-box;
   overflow: auto;
   &::-webkit-scrollbar {
@@ -411,9 +395,9 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 40px;
+    height: 4rem;
     position: relative;
-    padding: 0 6px;
+    padding: 0 .6rem;
     cursor: pointer;
     &.played {
       .name, .singer{
@@ -428,7 +412,7 @@ html, body {
       left: 0;
       right: 0;
       bottom: 0;
-      height: 1px;
+      height: .1rem;
       background-color: white;
       opacity: .3;
       transform: scaleY(.5);
@@ -441,11 +425,11 @@ html, body {
     }
     .name {
       color: white;
-      font-size: 14px;
+      font-size: 1.4rem;
       font-weight: bold;
     }
     .singer {
-      font-size: 12px;
+      font-size: 1.2rem;
       color: rgba(255,255,255,.8);
     }
     .name, .singer {
