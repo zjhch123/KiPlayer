@@ -87,7 +87,7 @@
           this.player.src = await MusicAPI.getMusicById(music.id);
           this.player.play();
           this.isPlaying = true;
-        } catch(exception) {
+        } catch (exception) {
           alert('获取歌曲信息失败...');
         }
       }
@@ -128,7 +128,7 @@
         const ctx = this.ctx;
         ctx.clearRect(0, 0, 224, 224);
         ctx.beginPath();
-        ctx.arc(112.5, 112.5, 88, -Math.PI / 2,degree - Math.PI / 2, false);
+        ctx.arc(112.5, 112.5, 83, -Math.PI / 2,degree - Math.PI / 2, false);
         ctx.stroke();
       },
       uTimeUpdate: function(e) {
@@ -318,7 +318,7 @@ body {
       .u-pause, .u-play {
         position: absolute;
         top: .6rem;
-        left: .6rm;
+        left: .6rem;
         height: 4.4rem;
         width: 4.4rem;
         transition: all .6s;
