@@ -60,7 +60,11 @@
     }),
     created: async function() {
       const self = this;
-      self.musicList = await MusicAPI.getPlayListById(926638907);
+      try {
+        self.musicList = await MusicAPI.getPlayListById(926638907);
+      } catch (exception) {
+        alert('拉取歌单信息失败');
+      }
     },
     mounted: function() {
       this.fResize();
@@ -79,9 +83,13 @@
       nowPlayIndex: async function(newVal) {
         const music = this.musicList[newVal];
         this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
-        this.player.src = await MusicAPI.getMusicById(music.id);
-        this.player.play();
-        this.isPlaying = true;
+        try {
+          this.player.src = await MusicAPI.getMusicById(music.id);
+          this.player.play();
+          this.isPlaying = true;
+        } catch(exception) {
+          alert('获取歌曲信息失败...');
+        }
       }
     },
     methods: {
