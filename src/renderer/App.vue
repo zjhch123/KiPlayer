@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="{prev: isPrev}">
+  <div id="app" :class="{normal: !isInputListId, prev: isPrev}">
     <main class="g-main">
       <div class="u-mask" :style="{transform: 'translateX(' + (progress - 100) + '%)'}"></div>
       <div class="u-bg" :style="{backgroundImage: 'url(' + bg + ')'}"></div>
@@ -40,6 +40,10 @@
         class="f-hide J_Player" 
         @timeupdate="uTimeUpdate"
         @ended="uPlayEnd"/>
+    <div class="g-input">
+      <input type="text" class="u-input" autofocus="true" />
+      <p class="u-tip">请输入歌单ID</p>
+    </div>
   </div>
 </template>
 <script>
@@ -49,6 +53,7 @@
     data: () => ({
       isPrev: true,
       bg: require('./assets/bg.jpg'),
+      isInputListId: false,
       isRandom: false,
       isPlaying: false,
       isListShow: true,
@@ -94,7 +99,11 @@
     },
     methods: {
       fResize: function() {
-        document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 / 16 * 100 + '%');
+        if (document.documentElement.clientWidth > 400) {
+          document.documentElement.style.fontSize = 10 / 16 * 100 + '%';
+        } else {
+          document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 / 16 * 100 + '%');
+        }
       },
       fPrevMusic: function() {
         this.uPrevMusic();
@@ -164,8 +173,8 @@ html {
 }
 body {
   margin: 0;
-  width: 100%;
-  padding-bottom: 100%;
+  width: 400px;
+  height: 400px;
   position: relative;
 }
 #app {
@@ -180,7 +189,7 @@ body {
   .g-main {
     -webkit-app-region: drag;
   }
-  &.prev,&:hover {
+  &.normal.prev,&.normal:hover {
     .g-footer, .g-list.show {
       transform: translate3d(0,0,0);
     }
@@ -448,6 +457,60 @@ body {
   }
   .f-hide {
     display: none;
+  }
+}
+@keyframes InputDOMFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes InputLabelFadeIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.g-input {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0, .8);
+  z-index: 51;
+  animation: InputDOMFadeIn .6s 2s;
+  animation-fill-mode: both;
+  .u-input {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -12.5rem;
+    margin-top: -2rem;
+    width: 25rem;
+    height: 4rem;
+    font-size: 2.2rem;
+    color: black;
+    outline: none;
+    padding-left: .8rem;
+    border: none;
+    transform-origin: center center;
+    animation: InputLabelFadeIn .6s 3s;
+    animation-fill-mode: both;
+  }
+  .u-tip {
+    position: absolute;
+    left: 50%;
+    top: 34%;
+    font-size: 2.2rem;
+    color: white;
+    z-index: 11;
+    transform: translate(-50%, -50%);
   }
 }
 </style>
