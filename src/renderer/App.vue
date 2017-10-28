@@ -79,12 +79,9 @@
       this.ctx = document.querySelector('.J_progress').getContext('2d');
       this.ctx.lineWidth = 40;
       this.ctx.strokeStyle = '#50E3C2';
-      setTimeout(() => {
+      setInterval(function() {
         this.fResize()
-      }, 0);
-      window.addEventListener('resize', () => {
-        this.fResize();
-      })
+      }.bind(this), 100);
     },
     watch: {
       nowPlayIndex: async function(newVal) {
@@ -101,11 +98,12 @@
     },
     methods: {
       fResize: function() {
-        if (document.documentElement.clientWidth > 400) {
-          document.documentElement.style.fontSize = '10px';
-        } else {
-          document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 + 'px');
-        }
+        let targetWidth = document.documentElement.clientWidth;
+        targetWidth = targetWidth > 400 ? 400 : targetWidth;
+        const percent = targetWidth / 400.0;
+        document.body.style.transform = `scale(${percent})`;
+        document.body.style.width = 400 * percent + 'px';
+        document.body.style.height = 400 * percent + 'px';
       },
       fPrevMusic: function() {
         this.uPrevMusic();
@@ -172,12 +170,15 @@ html {
   font-family: 'PingFangSC-Light','STHeiTi';
   -webkit-font-smoothing: antialiased;
   user-select: none;
+  font-size: 100px;
 }
 body {
   margin: 0;
-  height: 40rem;
-  width: 40rem;
+  height: 4rem;
+  width: 4rem;
   position: relative;
+  transform-origin: left top;
+  overflow: hidden;
 }
 #app {
   position: absolute;
@@ -185,8 +186,8 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 40rem;
-  height: 40rem;
+  width: 4rem;
+  height: 4rem;
   overflow: hidden;
   .g-main {
     -webkit-app-region: drag;
@@ -228,7 +229,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 8.4rem;
+  height: .84rem;
   overflow: hidden;
   background-color: rgba(0,0,0,0.8);
   z-index: 9;
@@ -239,7 +240,7 @@ body {
     align-items: center;
     justify-content: space-around;
     height: 100%;
-    padding: 0 2.8rem;
+    padding: 0 .28rem;
     .u-btn {
       display: block;
       background-size: 100% auto;
@@ -249,8 +250,8 @@ body {
       }
     }
     .m-mode {
-      height: 1.7rem;
-      width: 2.2rem;
+      height: .17rem;
+      width: .22rem;
       position: relative;
       &.random {
         .u-mode-random {
@@ -276,8 +277,8 @@ body {
         position: absolute;
         top: 0;
         left: 0;
-        width: 2.2rem;
-        height: 1.7rem;
+        width: .22rem;
+        height: .17rem;
         opacity: 0;
         transition: all .6s;
       }
@@ -289,8 +290,8 @@ body {
       }
     }
     .u-next, .u-prev {
-      height: 1.8rem;
-      width: 2.2rem;
+      height: .18rem;
+      width: .22rem;
       transition: all .6s;
       &:active {
         transform: scale(.8);
@@ -303,8 +304,8 @@ body {
       background-image: url('./assets/next.svg');
     }
     .m-staus {
-      width: 5.6rem;
-      height: 5.6rem;
+      width: .56rem;
+      height: .56rem;
       position: relative;
       &.play {
         .u-pause {
@@ -328,10 +329,10 @@ body {
       }
       .u-pause, .u-play {
         position: absolute;
-        top: .6rem;
-        left: .6rem;
-        height: 4.4rem;
-        width: 4.4rem;
+        top: .06rem;
+        left: .06rem;
+        height: .44rem;
+        width: .44rem;
         transition: all .6s;
         opacity: 0;
       }
@@ -343,8 +344,8 @@ body {
       }
     }
     .m-list {
-      width: 2.2rem;
-      height: 1.5rem;
+      width: .22rem;
+      height: .15rem;
       position: relative;
       &.fill {
         .u-list-fill {
@@ -367,8 +368,8 @@ body {
         }
       }
       .u-list, .u-list-fill {
-        height: 1.5rem;
-        width: 2.2rem; 
+        height: .15rem;
+        width: .22rem; 
         transition: all .6s;
         position: absolute;
         top: 0;
@@ -395,8 +396,8 @@ body {
 }
 .g-list {
   position: absolute;
-  height: 31.6rem;
-  width: 40rem;
+  height: 3.16rem;
+  width: 4rem;
   top: 0;
   left: 0;
   background-color: rgba(0,0,0,.6);
@@ -404,7 +405,7 @@ body {
   z-index: 9;
   transform: translate3d(0,-100%, 0);
   transition: all .6s;
-  padding: 2.4rem 1.6rem;
+  padding: .24rem .16rem;
   box-sizing: border-box;
   overflow: auto;
   &::-webkit-scrollbar {
@@ -414,16 +415,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 4rem;
+    height: .4rem;
     position: relative;
-    padding: 0 .6rem;
+    padding: 0 .06rem;
     cursor: pointer;
     &.played {
       .name, .singer{
         color: #50E3C2;
       }
       &:after {
-        background-color: #50E3C2;
+        background-color: rgba(80,227,194, .3);
       }
     }
     &:after {
@@ -431,10 +432,9 @@ body {
       left: 0;
       right: 0;
       bottom: 0;
-      height: .1rem;
-      background-color: white;
-      opacity: .3;
-      transform: scaleY(.5);
+      height: .01rem;
+      background-color: rgba(255, 255, 255, .3);
+      transform: scaleY(.5) translateZ(0);
       content: '';
     }
     &:active {
@@ -444,11 +444,11 @@ body {
     }
     .name {
       color: white;
-      font-size: 1.4rem;
+      font-size: .14rem;
       font-weight: bold;
     }
     .singer {
-      font-size: 1.2rem;
+      font-size: .12rem;
       color: rgba(255,255,255,.8);
     }
     .name, .singer {
@@ -492,14 +492,14 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-left: -12.5rem;
-    margin-top: -2rem;
-    width: 25rem;
-    height: 4rem;
-    font-size: 2.2rem;
+    margin-left: -1.25rem;
+    margin-top: -.2rem;
+    width: 2.5rem;
+    height: .4rem;
+    font-size: .22rem;
     color: black;
     outline: none;
-    padding-left: .8rem;
+    padding-left: .08rem;
     border: none;
     transform-origin: center center;
     animation: InputLabelFadeIn .6s 3s;
@@ -509,7 +509,7 @@ body {
     position: absolute;
     left: 50%;
     top: 34%;
-    font-size: 2.2rem;
+    font-size: .22rem;
     color: white;
     z-index: 11;
     transform: translate(-50%, -50%);

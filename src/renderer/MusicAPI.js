@@ -1,8 +1,9 @@
+const Host = 'https://api.hduzplus.xyz';
 
 export default {
   getPlayListById: (id) => {
     return new Promise((resolve, reject) => {
-      fetch(`http://182.254.148.53:3000/playlist/detail?id=${id}`, {
+      fetch(`${Host}/playlist/detail?id=${id}`, {
         method: 'get',
         mode: 'cors'
       }).then(res => {
@@ -18,7 +19,7 @@ export default {
             name: b.name,
             id: b.id,
             singer: b.ar[0] && b.ar[0].name,
-            pic: b.al.picUrl + '?param=400y400'
+            pic: b.al.picUrl.replace('http:', 'https:') + '?param=400y400'
           });
           return a;
         }, []);
@@ -31,13 +32,13 @@ export default {
   },
   getMusicById: (id) => {
     return new Promise((resolve, reject) => {
-      fetch(`http://182.254.148.53:3000/music/url?id=${id}`, {
+      fetch(`${Host}/music/url?id=${id}`, {
         method: 'GET',
         mode: 'cors'
       }).then(res => {
         return res.json();
       }).then(data => {
-        resolve(data.data[0].url);
+        resolve(data.data[0].url.replace('http:', 'https:'));
       }).catch(() => {
         reject(new Error('网络请求失败'));
       })

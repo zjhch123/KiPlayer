@@ -10,75 +10,6 @@ if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
-const template = [
-  {
-    label: '操作',
-    submenu: [
-      {
-        label: '撤销',
-        accelerator: 'CmdOrCtrl+Z',
-        role: 'undo'
-      },
-      {
-        label: '前进',
-        accelerator: 'Shift+CmdOrCtrl+Z',
-        role: 'redo'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: '剪切',
-        accelerator: 'CmdOrCtrl+X',
-        role: 'cut'
-      },
-      {
-        label: '粘贴',
-        accelerator: 'CmdOrCtrl+C',
-        role: 'copy'
-      },
-      {
-        label: '复制',
-        accelerator: 'CmdOrCtrl+V',
-        role: 'paste'
-      },
-      {
-        label: '全选',
-        accelerator: 'CmdOrCtrl+A',
-        role: 'selectall'
-      },
-    ]
-  },
-  {
-    label: '设置',
-    submenu: [
-      {
-        label: '更改歌单',
-        click () {
-          dialog.showOpenDialog({
-            properties: ['openFile', 'openDirectory', 'multiSelections']
-          })
-        }
-      }
-    ]
-  },
-  {
-    label: '关于',
-    submenu: [
-      {
-        label: '项目地址',
-        click () { require('electron').shell.openExternal('https://github.com/zjhch123/KiPlayer') }
-      },
-      {type: 'separator'},
-      {
-        label: '作者',
-        click () { require('electron').shell.openExternal('https://www.hduzplus.xyz/') }
-      }
-    ]
-  }
-]
-
-
 let mainWindow
 let inputWindow
 const winURL = process.env.NODE_ENV === 'development'
@@ -109,6 +40,94 @@ function createWindow () {
     mainWindow = null
   })
 
+  const template = [
+    {
+      label: '操作',
+      submenu: [
+        {
+          label: '更改歌单',
+          click () {
+            dialog.showOpenDialog({
+              properties: ['openFile', 'openDirectory', 'multiSelections']
+            })
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: '暂停播放',
+          accelerator: 'CmdOrCtrl+K',
+          click() {
+          }
+        },
+        {
+          label: '上一首',
+          accelerator: 'CmdOrCtrl+J',
+          click() {
+          }
+        },
+        {
+          label: '下一首',
+          accelerator: 'CmdOrCtrl+L',
+          click() {
+          }
+        },
+      ]
+    },
+    {
+      label: '编辑',
+      submenu: [
+        {
+          label: '撤销',
+          accelerator: 'CmdOrCtrl+Z',
+          role: 'undo'
+        },
+        {
+          label: '前进',
+          accelerator: 'Shift+CmdOrCtrl+Z',
+          role: 'redo'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: '剪切',
+          accelerator: 'CmdOrCtrl+X',
+          role: 'cut'
+        },
+        {
+          label: '粘贴',
+          accelerator: 'CmdOrCtrl+C',
+          role: 'copy'
+        },
+        {
+          label: '复制',
+          accelerator: 'CmdOrCtrl+V',
+          role: 'paste'
+        },
+        {
+          label: '全选',
+          accelerator: 'CmdOrCtrl+A',
+          role: 'selectall'
+        },
+      ]
+    },
+    {
+      label: '关于',
+      submenu: [
+        {
+          label: '项目地址',
+          click () { require('electron').shell.openExternal('https://github.com/zjhch123/KiPlayer') }
+        },
+        {type: 'separator'},
+        {
+          label: '作者',
+          click () { require('electron').shell.openExternal('https://www.hduzplus.xyz/') }
+        }
+      ]
+    }
+  ]
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
