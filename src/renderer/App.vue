@@ -72,7 +72,6 @@
       }
     },
     mounted: function() {
-      this.fResize();
       setTimeout(() => {
         this.isPrev = false;
       }, 1000);
@@ -80,6 +79,9 @@
       this.ctx = document.querySelector('.J_progress').getContext('2d');
       this.ctx.lineWidth = 40;
       this.ctx.strokeStyle = '#50E3C2';
+      setTimeout(() => {
+        this.fResize()
+      }, 0);
       window.addEventListener('resize', () => {
         this.fResize();
       })
@@ -100,9 +102,9 @@
     methods: {
       fResize: function() {
         if (document.documentElement.clientWidth > 400) {
-          document.documentElement.style.fontSize = 10 / 16 * 100 + '%';
+          document.documentElement.style.fontSize = '10px';
         } else {
-          document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 / 16 * 100 + '%');
+          document.documentElement.style.fontSize = (document.documentElement.clientWidth / 40 + 'px');
         }
       },
       fPrevMusic: function() {
@@ -137,7 +139,7 @@
         const ctx = this.ctx;
         ctx.clearRect(0, 0, 224, 224);
         ctx.beginPath();
-        ctx.arc(112.5, 112.5, 83, -Math.PI / 2,degree - Math.PI / 2, false);
+        ctx.arc(112.5, 112.5, 80, -Math.PI / 2,degree - Math.PI / 2, false);
         ctx.stroke();
       },
       uTimeUpdate: function(e) {
@@ -166,15 +168,15 @@
 html {
   margin: 0;
   width: 100%;
-  height: 100%;
+  max-width: 400px;
   font-family: 'PingFangSC-Light','STHeiTi';
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
 body {
   margin: 0;
-  width: 400px;
-  height: 400px;
+  height: 40rem;
+  width: 40rem;
   position: relative;
 }
 #app {
@@ -183,8 +185,8 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  height: 100%;
+  width: 40rem;
+  height: 40rem;
   overflow: hidden;
   .g-main {
     -webkit-app-region: drag;
