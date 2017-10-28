@@ -63,6 +63,7 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
 #### 目前功能
 能获取网易云音乐指定歌单的歌曲信息，拉取封面图，并播放歌曲 api: [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
+线上预览链接: [时光遣散了故人](https://blog.hduzplus.xyz), 右侧
 #### 未来预计
 1. [] 用户能指定播放歌单
 2. [] 保存用户信息
