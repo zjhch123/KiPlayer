@@ -40,8 +40,9 @@
         class="f-hide J_Player" 
         @timeupdate="uTimeUpdate"
         @ended="uPlayEnd"/>
-    <div class="g-input">
-      <input type="text" class="u-input" autofocus="true" />
+    <div class="g-input" :class="{'f-show': isInputListId}">
+      <div class="g-mask"></div>
+      <input type="text" class="u-input J_input" autofocus="true" />
       <p class="u-tip">请输入歌单ID</p>
     </div>
   </div>
@@ -82,6 +83,15 @@
       setInterval(function() {
         this.fResize()
       }.bind(this), 100);
+      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(function() {
+        this.isInputListId = true;
+        setTimeout(function() {
+          document.querySelector('.J_input').focus();
+        }, 1800);
+      }, 300).bind(this));
+      document.querySelector('.g-mask').addEventListener('click', () => {
+        this.isInputListId = false;
+      });
     },
     watch: {
       nowPlayIndex: async function(newVal) {
@@ -97,6 +107,25 @@
       }
     },
     methods: {
+      fDoubleClick: function(func, timer) {
+        let count = 0;
+        let timeoutId = 0;
+        let args, context;
+        return function() {
+          args = arguments;
+          context = this;
+          count += 1;
+          clearTimeout(timeoutId);
+          if (count == 2) {
+            count = 0;
+            func.apply(context, args);
+            return;
+          }
+          timeoutId = setTimeout(function() {
+            count = 0;
+          }, timer);
+        }
+      },
       fResize: function() {
         let targetWidth = document.documentElement.clientWidth;
         targetWidth = targetWidth > 400 ? 400 : targetWidth;
@@ -191,6 +220,14 @@ body {
   overflow: hidden;
   .g-main {
     -webkit-app-region: drag;
+    .u-mask {
+      display: none;
+    }
+  }
+  &.normal {
+    .g-main .u-mask {
+      display: block;
+    }
   }
   &.normal.prev,&.normal:hover {
     .g-footer, .g-list.show {
@@ -478,7 +515,6 @@ body {
   }
 }
 .g-input {
-  display: none;
   width: 100%;
   height: 100%;
   position: absolute;
@@ -486,10 +522,28 @@ body {
   left: 0;
   background-color: rgba(0,0,0, .8);
   z-index: 51;
-  animation: InputDOMFadeIn .6s 2s;
-  animation-fill-mode: both;
+  opacity: 0;
+  pointer-events: none;
+  transition: all .6s .6s;
+  &.f-show {
+    opacity: 1;
+    pointer-events: auto;
+    .u-input {
+      transition: all .6s 1.2s;
+      transform: scaleX(1);
+    }
+  }
+  .g-mask {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
   .u-input {
     position: absolute;
+    z-index: 2;
     left: 50%;
     top: 50%;
     margin-left: -1.25rem;
@@ -502,8 +556,8 @@ body {
     padding-left: .08rem;
     border: none;
     transform-origin: center center;
-    animation: InputLabelFadeIn .6s 3s;
-    animation-fill-mode: both;
+    transform: scaleX(0);
+    transition: all .6s;
   }
   .u-tip {
     position: absolute;
