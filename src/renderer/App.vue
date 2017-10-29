@@ -42,7 +42,7 @@
         @ended="uPlayEnd"/>
     <div class="g-input" :class="{'f-show': isInputListId}">
       <div class="g-mask"></div>
-      <input type="text" class="u-input J_input" autofocus="true" />
+      <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicList"/>
       <p class="u-tip">请输入歌单ID</p>
     </div>
   </div>
@@ -68,6 +68,9 @@
       const self = this;
       try {
         self.musicList = await MusicAPI.getPlayListById(926638907);
+        self.nowPlayIndex = -1;
+        self.progress = 0;
+        self.bg = require('./assets/bg.jpg');
       } catch (exception) {
         alert('拉取歌单信息失败');
       }
@@ -107,6 +110,18 @@
       }
     },
     methods: {
+      fSwitchMusicList: async function(e) {
+        // this.isPlaying = false;
+        // this.player.pause();
+        // try {
+        //   this.musicList = await MusicAPI.getPlayListById(e.target.value);
+        //   this.nowPlayIndex = 0;
+        //   this.progress = 0;
+        //   console.log(this.musicList)
+        // } catch (exception) {
+        //   alert('拉取歌单信息失败');
+        // }
+      },
       fDoubleClick: function(func, timer) {
         let count = 0;
         let timeoutId = 0;
