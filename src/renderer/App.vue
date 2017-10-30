@@ -52,7 +52,7 @@
 </template>
 <script>
   import MusicAPI from './MusicAPI.js';
-  // import {ipcRenderer} from 'electron';
+  import {ipcRenderer} from 'electron';
   export default {
     name: 'kirisame',
     data: () => ({
@@ -79,22 +79,22 @@
         this.musicListId = pid;
         document.querySelector('.J_input').value = pid;
       }
-      // ipcRenderer.on('control', function(e, arg) {
-      //   switch (arg) {
-      //     case 'switchList':
-      //       self.fShowInputListDOM();
-      //       break;
-      //     case 'switchStatus':
-      //       self.fChangeStatus();
-      //       break;
-      //     case 'prev':
-      //       self.fPrevMusic();
-      //       break;
-      //     case 'next':
-      //       self.fNextMusic();
-      //       break;
-      //   }
-      // });
+      ipcRenderer.on('control', function(e, arg) {
+        switch (arg) {
+          case 'switchList':
+            self.fShowInputListDOM();
+            break;
+          case 'switchStatus':
+            self.fChangeStatus();
+            break;
+          case 'prev':
+            self.fPrevMusic();
+            break;
+          case 'next':
+            self.fNextMusic();
+            break;
+        }
+      });
       try {
         self.musicList = await MusicAPI.getPlayListById(this.musicListId);
         self.nowPlayIndex = -1;

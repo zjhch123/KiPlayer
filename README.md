@@ -33,7 +33,7 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
 
 #### 程序运行截图
 ##### 1. 主界面
-![主界面](https://raw.githubusercontent.com/zjhch123/KiPlayer/master/preview/main.jpg)
+![主界面](https://raw.githubusercontent.com/zjhch123/KiPlayer/master/preview/main.png)
 1. 构成:
  * 歌曲封面图
  * 黑色透明模糊的进度条
@@ -41,7 +41,7 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
  * 刚启动时，显示菜单栏/歌曲列表，没有任何操作的话1s消失
  * 鼠标移入app，显示菜单栏/歌曲列表(如果激活的话)，进度条渐隐
 ##### 2. 显示菜单栏
-![菜单栏](https://github.com/zjhch123/KiPlayer/blob/master/preview/hover.jpg)
+![菜单栏](https://github.com/zjhch123/KiPlayer/blob/master/preview/hover.png)
 1. 构成:
  * 是否随机播放
  * 上一首
@@ -54,12 +54,20 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
  * 点击歌曲列表，移入歌曲列表层
 
 ##### 3. 歌曲列表
-![列表](https://github.com/zjhch123/KiPlayer/blob/master/preview/showList.jpg)
+![列表](https://github.com/zjhch123/KiPlayer/blob/master/preview/showList.png)
 1. 构成:
  * 歌曲列表 
 2. 交互:
  * 点击歌曲，scale效果
  
+##### 4. 切换歌单
+![切换歌单](https://github.com/zjhch123/KiPlayer/blob/master/preview/inputListId.png)
+1. 构成:
+ * Inpu框
+2. 交互:
+ * 双击主菜单唤醒切换歌单DOM
+ * 敲击回车确认输入
+
 #### 目前功能
 能获取网易云音乐指定歌单的歌曲信息，拉取封面图，并播放歌曲 api: [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
