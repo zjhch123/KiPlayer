@@ -65,6 +65,6 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
 
 线上预览链接: [时光遣散了故人](https://blog.hduzplus.xyz), 右侧
 #### 未来预计
-1. [] 用户能指定播放歌单
+1. [x] 用户能指定播放歌单
 2. [] 保存用户信息
 3. [] 自动更新
