@@ -1,7 +1,7 @@
 <template>
   <div id="app" :class="{normal: !isInputListId, prev: isPrev}">
     <main class="g-main">
-      <div class="u-mask" :style="{transform: 'translateX(' + (progress - 100) + '%)'}"></div>
+      <div class="u-mask" :style="{transform: 'translate3d(' + (progress - 100) + '%,0,0)'}"></div>
       <div class="u-bg" :style="{backgroundImage: 'url(' + bg + ')'}"></div>
     </main>
     <section class="g-list" :class="{show: isListShow}">
@@ -40,10 +40,13 @@
         class="f-hide J_Player" 
         @timeupdate="uTimeUpdate"
         @ended="uPlayEnd"/>
-    <div class="g-input" :class="{'f-show': isInputListId}">
+    <div class="g-input" :class="{'f-show': isInputListId, 'f-waiting': isFetching}">
       <div class="g-mask"></div>
-      <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicList"/>
+      <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicList" value="926638907"/>
       <p class="u-tip">请输入歌单ID</p>
+      <div class="u-waiting">
+        获取歌单中...
+      </div>
     </div>
   </div>
 </template>
@@ -63,11 +66,15 @@
       player: null,
       progress: 0,
       nowPlayIndex: -1,
+      musicListId: 926638907,
+      isFetching: false
+      // id: 50787020,
+      // id: 10602549
     }),
     created: async function() {
       const self = this;
       try {
-        self.musicList = await MusicAPI.getPlayListById(926638907);
+        self.musicList = await MusicAPI.getPlayListById(this.musicListId);
         self.nowPlayIndex = -1;
         self.progress = 0;
         self.bg = require('./assets/bg.jpg');
@@ -86,41 +93,57 @@
       setInterval(function() {
         this.fResize()
       }.bind(this), 100);
-      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(function() {
-        this.isInputListId = true;
-        setTimeout(function() {
-          document.querySelector('.J_input').focus();
-        }, 1800);
-      }, 300).bind(this));
+      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(this.fShowInputListDOM, 300).bind(this));
       document.querySelector('.g-mask').addEventListener('click', () => {
         this.isInputListId = false;
       });
     },
     watch: {
       nowPlayIndex: async function(newVal) {
-        const music = this.musicList[newVal];
-        this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
-        try {
-          this.player.src = await MusicAPI.getMusicById(music.id);
-          this.player.play();
-          this.isPlaying = true;
-        } catch (exception) {
-          alert('获取歌曲信息失败...');
+        if (newVal != -1) {
+          const music = this.musicList[newVal];
+          this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
+          try {
+            this.player.src = await MusicAPI.getMusicById(music.id);
+            this.player.play();
+            this.isPlaying = true;
+            document.querySelector(`[data-index="${newVal}"]`).scrollIntoViewIfNeeded();
+          } catch (exception) {
+            alert('获取歌曲信息失败...');
+          }
         }
+      },
+      progress: function(newVal) {
+        this.uDrawCircle(Math.PI * 2.0 * newVal / 100);
+      },
+      musicListId: async function(newVal) {
+        this.isFetching = true;
+        try {
+          this.isPlaying = false;
+          this.player.pause();
+          this.player.src = '';
+          this.musicList = await MusicAPI.getPlayListById(this.musicListId);
+          this.bg = require('./assets/bg.jpg');
+          this.nowPlayIndex = -1;
+          this.progress = 0;
+        } catch (exception) {
+          alert('拉取歌单信息失败');
+        }
+        this.isFetching = false;
+        setTimeout(() => {
+          this.isInputListId = false;
+        }, 600);
       }
     },
     methods: {
       fSwitchMusicList: async function(e) {
-        // this.isPlaying = false;
-        // this.player.pause();
-        // try {
-        //   this.musicList = await MusicAPI.getPlayListById(e.target.value);
-        //   this.nowPlayIndex = 0;
-        //   this.progress = 0;
-        //   console.log(this.musicList)
-        // } catch (exception) {
-        //   alert('拉取歌单信息失败');
-        // }
+        this.musicListId = e.target.value;
+      },
+      fShowInputListDOM: function() {
+        this.isInputListId = true;
+        setTimeout(function() {
+          document.querySelector('.J_input').focus();
+        }, 1800);
       },
       fDoubleClick: function(func, timer) {
         let count = 0;
@@ -188,7 +211,6 @@
         const currentTime = e.target.currentTime;
         const totalTime = e.target.duration;
         this.progress = currentTime / totalTime * 100;
-        this.uDrawCircle(Math.PI * 2.0 * this.progress / 100);
       },
       uPrevMusic: function() {
         this.nowPlayIndex = (this.nowPlayIndex === 0 ? this.musicList.length : this.nowPlayIndex) - 1;
@@ -285,7 +307,7 @@ body {
   overflow: hidden;
   background-color: rgba(0,0,0,0.8);
   z-index: 9;
-  transform: translateY(100%);
+  transform: translate3d(0,100%,0);
   transition: all .6s;
   .m-controller {
     display: flex;
@@ -439,7 +461,7 @@ body {
       position: absolute;
       left: 50%;
       top: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate3d(-50%, -50%,0);
       width: 100%;
       height: 100%;
       border-radius: 50%;
@@ -548,6 +570,12 @@ body {
       transform: scaleX(1);
     }
   }
+  &.f-waiting {
+    .u-waiting {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
   .g-mask {
     position: absolute;
     left: 0;
@@ -581,7 +609,23 @@ body {
     font-size: .22rem;
     color: white;
     z-index: 11;
-    transform: translate(-50%, -50%);
+    transform: translate3d(-50%, -50%, 0);
+  }
+  .u-waiting {
+    position: absolute;
+    z-index: 31;
+    background-color: rgba(0,0,0,.8);
+    font-size: .24rem;
+    color: white;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 4rem;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: all .6s;
   }
 }
 </style>
