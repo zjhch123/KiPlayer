@@ -36,10 +36,6 @@
         </div>
       </div>
     </footer>
-    <audio src="" 
-        class="f-hide J_Player" 
-        @timeupdate="uTimeUpdate"
-        @ended="uPlayEnd"/>
     <div class="g-input" :class="{'f-show': isInputListId, 'f-waiting': isFetching}">
       <div class="g-mask"></div>
       <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicList" value="926638907"/>
@@ -48,10 +44,15 @@
         获取歌单中...
       </div>
     </div>
+    <audio src="" 
+        class="f-hide J_Player" 
+        @timeupdate="uTimeUpdate"
+        @ended="uPlayEnd"/>
   </div>
 </template>
 <script>
   import MusicAPI from './MusicAPI.js';
+  // import {ipcRenderer} from 'electron';
   export default {
     name: 'kirisame',
     data: () => ({
@@ -73,6 +74,27 @@
     }),
     created: async function() {
       const self = this;
+      let pid = this.uGetUrlParam(window.location.search, 'id');
+      if (pid) {
+        this.musicListId = pid;
+        document.querySelector('.J_input').value = pid;
+      }
+      // ipcRenderer.on('control', function(e, arg) {
+      //   switch (arg) {
+      //     case 'switchList':
+      //       self.fShowInputListDOM();
+      //       break;
+      //     case 'switchStatus':
+      //       self.fChangeStatus();
+      //       break;
+      //     case 'prev':
+      //       self.fPrevMusic();
+      //       break;
+      //     case 'next':
+      //       self.fNextMusic();
+      //       break;
+      //   }
+      // });
       try {
         self.musicList = await MusicAPI.getPlayListById(this.musicListId);
         self.nowPlayIndex = -1;
@@ -116,23 +138,27 @@
       progress: function(newVal) {
         this.uDrawCircle(Math.PI * 2.0 * newVal / 100);
       },
-      musicListId: async function(newVal) {
+      musicListId: async function(newVal, oldVal) {
         this.isFetching = true;
         try {
+          const newMusicList = await MusicAPI.getPlayListById(this.musicListId);
           this.isPlaying = false;
           this.player.pause();
           this.player.src = '';
-          this.musicList = await MusicAPI.getPlayListById(this.musicListId);
+          this.musicList = newMusicList;
           this.bg = require('./assets/bg.jpg');
           this.nowPlayIndex = -1;
           this.progress = 0;
         } catch (exception) {
           alert('拉取歌单信息失败');
+          this.isFetching = false;
+          return;
         }
         this.isFetching = false;
         setTimeout(() => {
           this.isInputListId = false;
         }, 600);
+        document.querySelector('.J_input').value = this.musicListId;
       }
     },
     methods: {
@@ -213,7 +239,7 @@
         this.progress = currentTime / totalTime * 100;
       },
       uPrevMusic: function() {
-        this.nowPlayIndex = (this.nowPlayIndex === 0 ? this.musicList.length : this.nowPlayIndex) - 1;
+        this.nowPlayIndex = (this.nowPlayIndex <= 0 ? this.musicList.length : this.nowPlayIndex) - 1;
       },
       uNextMusic: function() {
         this.nowPlayIndex = (this.nowPlayIndex + 1) % this.musicList.length;
@@ -224,7 +250,14 @@
         } else {
           this.uNextMusic();
         }
-      }
+      },
+      uGetUrlParam: function(_str, _name) {
+        let self = this;
+        let _reg = new RegExp('(^|&|\\?)' + _name + '=([^&]*)(&|$)'),
+            _r = _str.replace(/script|%22|%3E|%3C|'|"|>|<|\\/g,'_').match(_reg);
+
+        if (_r != null) return decodeURIComponent(_r[2]); return '';
+      },
     }
   }
 </script>
@@ -258,12 +291,13 @@ body {
   .g-main {
     -webkit-app-region: drag;
     .u-mask {
-      display: none;
+      background-color: rgba(0,0,0,0);
     }
   }
   &.normal {
     .g-main .u-mask {
       display: block;
+      background-color: rgba(0,0,0,.4);
     }
   }
   &.normal.prev,&.normal:hover {
@@ -601,6 +635,7 @@ body {
     transform-origin: center center;
     transform: scaleX(0);
     transition: all .6s;
+    -webkit-app-region: no-drag;
   }
   .u-tip {
     position: absolute;
