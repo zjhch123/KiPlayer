@@ -1,7 +1,7 @@
 <template>
   <div id="app" :class="{'f-normal': !isInputListId, 'f-prev': isPrev}">
     <header class="g-header"></header>
-    <main class="g-main">
+    <main class="g-main" v-dbclick="fShowInputListDOMHandler">
       <div class="u-mask" :style="{transform: 'translate3d(' + (progress - 100) + '%,0,0)'}"></div>
       <div class="u-bg" :style="{backgroundImage: 'url(' + bg + ')'}"></div>
     </main>
@@ -117,7 +117,6 @@
       setInterval(function() {
         this.fResize()
       }.bind(this), 100);
-      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(this.fShowInputListDOMHandler, 300).bind(this));
     },
     watch: {
       nowPlayIndex: async function(newVal) {
@@ -289,8 +288,9 @@
     },
     directives: {
       dbclick: {
-        bind: function(el, binding) {
-          
+        bind: function(el, binding, vnode) {
+          const func = binding.expression;
+          el.addEventListener('click', vnode.context.fDoubleClick(vnode.context[func], 300));
         }
       }
     }

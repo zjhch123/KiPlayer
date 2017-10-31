@@ -20,8 +20,8 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    width: 1060,
-    height: 600,
+    width: 400,
+    height: 400,
     useContentSize: true,
     resizable: false,
     titleBarStyle: 'hidden',
@@ -36,12 +36,12 @@ function createWindow () {
 
   mainWindow.loadURL(winURL)
 
-  // mainWindow.on('close', (e) => {
-  //   if (mainWindow.isVisible()) {
-  //     mainWindow.hide();
-  //     e.preventDefault();
-  //   }
-  // });
+  mainWindow.on('close', (e) => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+      e.preventDefault();
+    }
+  });
 
   mainWindow.on('closed', (e) => {
     mainWindow = null;
