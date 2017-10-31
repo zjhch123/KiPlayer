@@ -1,16 +1,17 @@
 <template>
-  <div id="app" :class="{normal: !isInputListId, prev: isPrev}">
+  <div id="app" :class="{'f-normal': !isInputListId, 'f-prev': isPrev}">
+    <header class="g-header"></header>
     <main class="g-main">
       <div class="u-mask" :style="{transform: 'translate3d(' + (progress - 100) + '%,0,0)'}"></div>
       <div class="u-bg" :style="{backgroundImage: 'url(' + bg + ')'}"></div>
     </main>
-    <section class="g-list" :class="{show: isListShow}">
+    <section class="g-list" :class="{'f-show': isListShow}">
       <div
           v-for="(music, index) in musicList"  
           class="u-item list-complete-item" 
-          :class="{played: nowPlayIndex == index}"
+          :class="{'f-played': nowPlayIndex == index}"
           v-bind:key="music.id"
-          @click.stop.capture="fMusicClick" 
+          @click.stop.capture="fMusicItemClickHandler" 
           :data-index="index">
           <span class="name">{{music.name}}</span>
           <span class="singer">{{music.singer}}</span>
@@ -19,26 +20,26 @@
     <footer class="g-footer">
       <div class="u-bg"></div>
       <div class="m-controller">
-        <div class="m-mode" :class="{random: isRandom, normal: !isRandom}" @click="fChangeMode">
+        <div class="m-mode" :class="{'f-random': isRandom, 'f-normal': !isRandom}" @click="fChangeModeClickHandler">
           <a href="javascript:;" class="u-mode-random u-btn"></a>
           <a href="javascript:;" class="u-mode-normal u-btn"></a>
         </div>
-        <a href="javascript:;" class="u-prev u-btn" @click="fPrevMusic"></a>
-        <div class="m-staus" :class="{play: isPlaying, pause: !isPlaying}" @click="fChangeStatus">
+        <a href="javascript:;" class="u-prev u-btn" @click="fPrevMusicClickHandler"></a>
+        <div class="m-staus" :class="{'f-play': isPlaying, 'f-pause': !isPlaying}" @click="fChangeStatusClickHandler">
           <canvas width="224" height="224" class="u-progress J_progress"></canvas>
           <a href="javascript:;" class="u-pause u-btn"></a>
           <a href="javascript:;" class="u-play u-btn"></a>
         </div>
-        <a href="javascript:;" class="u-next u-btn" @click="fNextMusic"></a>
-        <div class="m-list" :class="{fill: isListShow, unfill: !isListShow}" @click="fShowListClick">
+        <a href="javascript:;" class="u-next u-btn" @click="fNextMusicClickHandler"></a>
+        <div class="m-list" :class="{'f-fill': isListShow, 'f-unfill': !isListShow}" @click="fShowListClickHandler">
           <a href="javascript:;" class="u-list u-btn"></a>  
           <a href="javascript:;" class="u-list-fill u-btn"></a>  
         </div>
       </div>
     </footer>
     <div class="g-input" :class="{'f-show': isInputListId, 'f-waiting': isFetching}">
-      <div class="g-mask"></div>
-      <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicList" value="926638907"/>
+      <div class="g-mask" @click="fHideInputListClickHandler"></div>
+      <input type="text" class="u-input J_input" autofocus="true" @keyup.enter="fSwitchMusicListHandler" value="926638907"/>
       <p class="u-tip">请输入歌单ID</p>
       <div class="u-waiting">
         获取歌单中...
@@ -46,6 +47,7 @@
     </div>
     <audio src="" 
         class="f-hide J_Player" 
+        @canplay="uAudioCanPlay"
         @timeupdate="uTimeUpdate"
         @ended="uPlayEnd"/>
   </div>
@@ -82,16 +84,16 @@
       ipcRenderer.on('control', function(e, arg) {
         switch (arg) {
           case 'switchList':
-            self.fShowInputListDOM();
+            self.uShowInputListDOM();
             break;
           case 'switchStatus':
-            self.fChangeStatus();
+            self.uChangeStatus();
             break;
           case 'prev':
-            self.fPrevMusic();
+            self.uPrevMusic();
             break;
           case 'next':
-            self.fNextMusic();
+            self.uNextMusic();
             break;
         }
       });
@@ -115,10 +117,7 @@
       setInterval(function() {
         this.fResize()
       }.bind(this), 100);
-      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(this.fShowInputListDOM, 300).bind(this));
-      document.querySelector('.g-mask').addEventListener('click', () => {
-        this.isInputListId = false;
-      });
+      document.querySelector('.g-main').addEventListener('click', this.fDoubleClick(this.fShowInputListDOMHandler, 300).bind(this));
     },
     watch: {
       nowPlayIndex: async function(newVal) {
@@ -127,9 +126,8 @@
           this.bg = music.pic ? music.pic : require('./assets/bg.jpg');
           try {
             this.player.src = await MusicAPI.getMusicById(music.id);
-            this.player.play();
             this.isPlaying = true;
-            document.querySelector(`[data-index="${newVal}"]`).scrollIntoViewIfNeeded();
+            document.querySelector(`[data-index="${newVal}"]`).scrollIntoView(false);
           } catch (exception) {
             alert('获取歌曲信息失败...');
           }
@@ -138,12 +136,21 @@
       progress: function(newVal) {
         this.uDrawCircle(Math.PI * 2.0 * newVal / 100);
       },
+      isPlaying: function(newVal, oldVal) {
+        if (this.player && newVal == true) {
+          // 设置为true, 则开始播放
+          this.player.play();
+        }
+        if (this.player && newVal == false) {
+          // 设置为false, 则暂停
+          this.player.pause();
+        }
+      },
       musicListId: async function(newVal, oldVal) {
         this.isFetching = true;
         try {
           const newMusicList = await MusicAPI.getPlayListById(this.musicListId);
           this.isPlaying = false;
-          this.player.pause();
           this.player.src = '';
           this.musicList = newMusicList;
           this.bg = require('./assets/bg.jpg');
@@ -158,19 +165,9 @@
         setTimeout(() => {
           this.isInputListId = false;
         }, 600);
-        document.querySelector('.J_input').value = this.musicListId;
       }
     },
     methods: {
-      fSwitchMusicList: async function(e) {
-        this.musicListId = e.target.value;
-      },
-      fShowInputListDOM: function() {
-        this.isInputListId = true;
-        setTimeout(function() {
-          document.querySelector('.J_input').focus();
-        }, 1800);
-      },
       fDoubleClick: function(func, timer) {
         let count = 0;
         let timeoutId = 0;
@@ -198,33 +195,59 @@
         document.body.style.width = 400 * percent + 'px';
         document.body.style.height = 400 * percent + 'px';
       },
-      fPrevMusic: function() {
+      fPrevMusicClickHandler: function() {
         this.uPrevMusic();
       },
-      fNextMusic: function() {
+      fNextMusicClickHandler: function() {
         this.uNextMusic();
       },
-      fChangeMode: function() {
+      fChangeModeClickHandler: function() {
         this.isRandom = !this.isRandom;
       },
-      fChangeStatus: function() {
+      fChangeStatusClickHandler: function() {
+        this.uChangeStatus();
+      },
+      fShowListClickHandler: function() {
+        this.uSwitchListStatus();
+      },
+      fSwitchMusicListHandler: async function(e) {
+        const musicListId = e.target.value;
+        this.uSwitchMusiList(musicListId);
+      },
+      fMusicItemClickHandler: function(e) {
+        const id = ~~e.target.getAttribute('data-index');
+        this.uSwitchMusic(id);
+      },
+      fHideInputListClickHandler: function() {
+        this.uHideInputList();
+      },
+      fShowInputListDOMHandler: function() {
+        this.uShowInputListDOM();
+      },
+      uShowInputListDOM: function() {
+        this.isInputListId = true;
+        setTimeout(function() {
+          document.querySelector('.J_input').focus();
+        }, 1800);
+      },
+      uSwitchListStatus: function() {
+        this.isListShow = !this.isListShow;
+      },
+      uSwitchMusiList: function(musicListId) {
+        this.musicListId = musicListId;
+      },
+      uSwitchMusic: function(id) {
+        this.nowPlayIndex = id;
+      },
+      uHideInputList: function() {
+        this.isInputListId = false;
+      },
+      uChangeStatus: function() {
         if (this.nowPlayIndex === -1) {
           this.nowPlayIndex = 0;
           return;
         }
-        if (this.isPlaying) {
-          this.player.pause();
-        } else {
-          this.player.play();
-        }
         this.isPlaying = !this.isPlaying;
-      },
-      fShowListClick: function() {
-        this.isListShow = !this.isListShow;
-      },
-      fMusicClick: function(e) {
-        const id = ~~e.target.getAttribute('data-index');
-        this.nowPlayIndex = id;
       },
       uDrawCircle: function(degree) {
         const ctx = this.ctx;
@@ -251,6 +274,11 @@
           this.uNextMusic();
         }
       },
+      uAudioCanPlay: function() {
+        if (this.isPlaying) {
+          this.player.play();
+        }
+      },
       uGetUrlParam: function(_str, _name) {
         let self = this;
         let _reg = new RegExp('(^|&|\\?)' + _name + '=([^&]*)(&|$)'),
@@ -258,6 +286,13 @@
 
         if (_r != null) return decodeURIComponent(_r[2]); return '';
       },
+    },
+    directives: {
+      dbclick: {
+        bind: function(el, binding) {
+          
+        }
+      }
     }
   }
 </script>
@@ -288,20 +323,28 @@ body {
   width: 4rem;
   height: 4rem;
   overflow: hidden;
-  .g-main {
+  .g-header {
+    width: 4rem;
+    height: .22rem;
+    position: absolute;
+    top: 0;
+    left: 0;
     -webkit-app-region: drag;
+    z-index: 2;
+  }
+  .g-main {
     .u-mask {
       background-color: rgba(0,0,0,0);
     }
   }
-  &.normal {
+  &.f-normal {
     .g-main .u-mask {
       display: block;
       background-color: rgba(0,0,0,.4);
     }
   }
-  &.normal.prev,&.normal:hover {
-    .g-footer, .g-list.show {
+  &.f-normal.f-prev,&.f-normal:hover {
+    .g-footer, .g-list.f-show {
       transform: translate3d(0,0,0);
     }
     .u-mask {
@@ -313,6 +356,8 @@ body {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
   .u-mask {
     position: absolute;
     top: 0;
@@ -361,7 +406,7 @@ body {
       height: .17rem;
       width: .22rem;
       position: relative;
-      &.random {
+      &.f-random {
         .u-mode-random {
           opacity: 1;
           pointer-events: auto;
@@ -371,7 +416,7 @@ body {
           pointer-events: none;
         }
       }
-      &.normal {
+      &.f-normal {
         .u-mode-random {
           transform: scale(.8);
           pointer-events: none;
@@ -415,7 +460,7 @@ body {
       width: .56rem;
       height: .56rem;
       position: relative;
-      &.play {
+      &.f-play {
         .u-pause {
           opacity: 1;
           pointer-events: auto;
@@ -425,7 +470,7 @@ body {
           pointer-events: none;
         }
       }
-      &.pause {
+      &.f-pause {
         .u-pause {
           transform: scale(.9);
           pointer-events: none;
@@ -455,7 +500,7 @@ body {
       width: .22rem;
       height: .15rem;
       position: relative;
-      &.fill {
+      &.f-fill {
         .u-list-fill {
           opacity: 1;
           pointer-events: auto;
@@ -465,7 +510,7 @@ body {
           pointer-events: none;
         }
       }
-      &.unfill {
+      &.f-unfill {
         .u-list-fill {
           transform: scale(.8);
           pointer-events: none;
@@ -527,7 +572,7 @@ body {
     position: relative;
     padding: 0 .06rem;
     cursor: pointer;
-    &.played {
+    &.f-played {
       .name, .singer{
         color: #50E3C2;
       }
