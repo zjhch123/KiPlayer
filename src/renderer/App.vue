@@ -194,6 +194,20 @@
         document.body.style.width = 400 * percent + 'px';
         document.body.style.height = 400 * percent + 'px';
       },
+      fGetCookies: function (name) {
+        const r = new RegExp("(^|;|\\s+)" + name + "=([^;]*)(;|$)");
+        const m = document.cookie.match(r);
+        return (!m ? '' : unescape(m[2]));
+      },
+      fSetCookie: function(name, v, expire, domain, path) {
+        let s = name + "=" + escape(v) + "; path=" + (path || '/') + (domain ? ("; domain=" + domain) : '');
+        if (expire > 0) {
+            const d = new Date();
+            d.setTime(d.getTime() + (+expire || 30) * 24 * 60 * 60 * 1000);
+            s += ";expires=" + d.toUTCString();
+        }
+        document.cookie = s;
+      },
       fPrevMusicClickHandler: function() {
         this.uPrevMusic();
       },
