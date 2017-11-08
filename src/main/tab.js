@@ -2,6 +2,20 @@ const {webContents} = require('electron')
 
 export default [
     {
+      label: 'Kirisame',
+      submenu: [
+        {role: 'about'},
+        {type: 'separator'},
+        {role: 'services', submenu: []},
+        {type: 'separator'},
+        {role: 'hide'},
+        {role: 'hideothers'},
+        {role: 'unhide'},
+        {type: 'separator'},
+        {role: 'quit'}
+      ]
+    },
+    {
       label: '操作',
       submenu: [
         {

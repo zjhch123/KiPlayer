@@ -36,12 +36,14 @@ function createWindow () {
 
   mainWindow.loadURL(winURL)
 
-  mainWindow.on('close', (e) => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide();
-      e.preventDefault();
-    }
-  });
+  if (process.env.NODE_ENV !== 'development') {
+    mainWindow.on('close', (e) => {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide();
+        e.preventDefault();
+      }
+    });
+  }
 
   mainWindow.on('closed', (e) => {
     mainWindow = null;

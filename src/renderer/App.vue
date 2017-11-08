@@ -71,15 +71,19 @@
       nowPlayIndex: -1,
       musicListId: 926638907,
       isFetching: false
-      // id: 50787020,
-      // id: 10602549
     }),
     created: async function() {
       const self = this;
-      let pid = this.uGetUrlParam(window.location.search, 'id');
+      let pid;
+      if (self.fGetCookies('pid')) {
+        pid = self.fGetCookies('pid');
+      } else if (self.uGetUrlParam(window.location.search, 'id')) {
+        pid = self.uGetUrlParam(window.location.search, 'id');
+      } else {
+        pid = 926638907;
+      }
       if (pid) {
         this.musicListId = pid;
-        document.querySelector('.J_input').value = pid;
       }
       ipcRenderer.on('control', function(e, arg) {
         switch (arg) {
@@ -117,6 +121,7 @@
       setInterval(function() {
         this.fResize()
       }.bind(this), 100);
+      document.querySelector('.J_input').value = this.musicListId;
     },
     watch: {
       nowPlayIndex: async function(newVal) {
@@ -161,6 +166,7 @@
           return;
         }
         this.isFetching = false;
+        this.fSetPidToCookie(newVal);
         setTimeout(() => {
           this.isInputListId = false;
         }, 600);
@@ -207,6 +213,12 @@
             s += ";expires=" + d.toUTCString();
         }
         document.cookie = s;
+      },
+      fGetPidFromCookie: function() {
+        return this.fGetCookies('pid');
+      },
+      fSetPidToCookie: function(pid) {
+        this.fSetCookie('pid', pid, 30);
       },
       fPrevMusicClickHandler: function() {
         this.uPrevMusic();
