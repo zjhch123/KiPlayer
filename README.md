@@ -80,7 +80,7 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
 其中, width和height的值必须固定1:1, 且不可超过400。
 #### 未来预计
 1. [x] 用户能指定播放歌单
-2. [] 保存用户信息
+2. [x] 保存用户信息
 3. [] 自动更新
 4. [x] 全局快捷键
 5. [x] web版本自定义默认歌单
