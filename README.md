@@ -72,6 +72,12 @@ Thanks for the designer [Dhanish](https://www.uplabs.com/dhanishgajjar) selfless
 能获取网易云音乐指定歌单的歌曲信息，拉取封面图，并播放歌曲 api: [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
 线上预览链接: [时光遣散了故人](https://blog.hduzplus.xyz), 右侧
+
+您可以在您的页面随意嵌入KiPlayer, 只需要添加如下代码:
+```
+<iframe src="https://music.hduzplus.xyz/" width="300" height="300" frameborder="no"></iframe>
+```
+其中, width和height的值必须固定1:1, 且不可超过400。
 #### 未来预计
 1. [x] 用户能指定播放歌单
 2. [] 保存用户信息
