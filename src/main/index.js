@@ -19,20 +19,37 @@ function createWindow () {
   /**
    * Initial window options
    */
-  mainWindow = new BrowserWindow({
-    width: 400,
-    height: 400,
-    useContentSize: true,
-    resizable: false,
-    titleBarStyle: 'hidden',
-    fullscreenable: false,
-    show: false,
-    frame: false,
-    webPreferences: {
-      defaultFontFamily: 'standard',
-      defaultEncoding: 'utf-8'
-    }
-  })
+  if (process.env.NODE_ENV !== 'production') {
+    mainWindow = new BrowserWindow({
+      width: 1040,
+      height: 600,
+      useContentSize: true,
+      resizable: false,
+      titleBarStyle: 'hidden',
+      fullscreenable: false,
+      show: false,
+      frame: false,
+      webPreferences: {
+        defaultFontFamily: 'standard',
+        defaultEncoding: 'utf-8'
+      }
+    })
+  } else {
+    mainWindow = new BrowserWindow({
+      width: 400,
+      height: 400,
+      useContentSize: true,
+      resizable: false,
+      titleBarStyle: 'hidden',
+      fullscreenable: false,
+      show: false,
+      frame: false,
+      webPreferences: {
+        defaultFontFamily: 'standard',
+        defaultEncoding: 'utf-8'
+      }
+    })
+  }
 
   mainWindow.loadURL(winURL)
 

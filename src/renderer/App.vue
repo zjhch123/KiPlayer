@@ -79,9 +79,7 @@
         pid = self.fGetCookies('pid');
       } else if (self.uGetUrlParam(window.location.search, 'id')) {
         pid = self.uGetUrlParam(window.location.search, 'id');
-      } else {
-        pid = 926638907;
-      }
+      } 
       if (pid) {
         this.musicListId = pid;
       }
