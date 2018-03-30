@@ -112,7 +112,7 @@
           try {
             this.player.src = await MusicAPI.getMusicById(music.id);
             this.isPlaying = true;
-            // document.querySelector(`[data-index="${newVal}"]`).scrollIntoView(false);
+            this.mIsPlaying(this.isPlaying);
           } catch (exception) {
             alert('获取歌曲信息失败...');
           }
@@ -121,21 +121,12 @@
       progress: function(newVal) {
         this.uDrawCircle(Math.PI * 2.0 * newVal / 100);
       },
-      isPlaying: function(newVal) {
-        if (this.player && newVal == true) {
-          // 设置为true, 则开始播放
-          this.player.play();
-        }
-        if (this.player && newVal == false) {
-          // 设置为false, 则暂停
-          this.player.pause();
-        }
-      },
       musicListId: async function(newVal) {
         this.isFetching = true;
         try {
           const newMusicList = await MusicAPI.getPlayListById(this.musicListId);
           this.isPlaying = false;
+          this.mIsPlaying(this.isPlaying);
           this.player.src = '';
           this.musicList = newMusicList;
           this.bg = require('./assets/bg.jpg');
@@ -154,6 +145,16 @@
       }
     },
     methods: {
+      mIsPlaying: function(val) {
+        if (this.player && val == true) {
+          // 设置为true, 则开始播放
+          this.player.play();
+        }
+        if (this.player && val == false) {
+          // 设置为false, 则暂停
+          this.player.pause();
+        }
+      },
       fDoubleClick: function(func, timer) {
         let count = 0;
         let timeoutId = 0;
@@ -254,6 +255,7 @@
           return;
         }
         this.isPlaying = !this.isPlaying;
+        this.mIsPlaying(this.isPlaying);
       },
       uDrawCircle: function(degree) {
         const ctx = this.ctx;
